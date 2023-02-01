@@ -16,4 +16,10 @@ const DESCRIPTIONS = [
 
 const TITLES = ['Add luggage','Switch to comfort class','Add meal','Choose seats','Travel by train'];
 
-export{TYPES,CITIES,DESCRIPTIONS, TITLES};
+const  PointFormat = {
+  MONTH: 'MMM D',
+  HOUR: 'HH:mm',
+  DAY: 'DD/MM/HH:mm'
+};
+
+export{TYPES, CITIES, DESCRIPTIONS, TITLES, PointFormat};

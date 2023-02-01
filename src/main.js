@@ -16,7 +16,6 @@ render(new NewEventButtonView(), headerMainContainer);
 render(new TripInfoView(), headerMainContainer, RenderPosition.AFTERBEGIN);
 render(new FilterListView(), filtersContainer);
 
-console.log(pointModel.getPoints());
-eventsPresenter.init(siteTripEventsContainer);
+eventsPresenter.init(siteTripEventsContainer, pointModel);
 
 
