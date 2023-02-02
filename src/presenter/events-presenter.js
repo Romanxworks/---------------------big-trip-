@@ -1,7 +1,7 @@
 import {render} from '../render.js';
 import PointsListView from '../view/points-list-view.js';
 import SortListView from '../view/sort-list-view.js';
-import AddDeletePointView from '../view/add-delete-point-view.js';
+import AddEditPointView from '../view/add-edit-point-view.js';
 import PointView from '../view/point-view.js';
 export default class EventsPresenter{
   eventsComponent = new PointsListView();
@@ -14,7 +14,7 @@ export default class EventsPresenter{
 
     render(new SortListView(), this.eventsContainer);
     render(this.eventsComponent, this.eventsContainer);
-    render(new AddDeletePointView, this.eventsComponent.getElement());
+    render(new AddEditPointView(this.offersList, this.pointsList[2]), this.eventsComponent.getElement());
 
     for (let i = 0; i < this.pointsList.length; i++) {
       render(

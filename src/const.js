@@ -19,7 +19,7 @@ const TITLES = ['Add luggage','Switch to comfort class','Add meal','Choose seats
 const  PointFormat = {
   MONTH: 'MMM D',
   HOUR: 'HH:mm',
-  DAY: 'DD/MM/HH:mm'
+  DAY: 'DD/MM/YY HH:mm'
 };
 
 export{TYPES, CITIES, DESCRIPTIONS, TITLES, PointFormat};
