@@ -13,15 +13,18 @@ const getEventTypeList = TYPES.map(createEventTypeElement).join('');
 const createDestinationItems = (city) => `<option value="${city}">${city}</option>`;
 const getDestinationList = CITIES.map(createDestinationItems).join('');
 
-const createOfferElement = ({id, title, price}) => (`<div class="event__offer-selector">
-<input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}-1" type="checkbox" name="event-offer-${id}">
+const createOfferElement = ({id, title, price}, checked) => (`<div class="event__offer-selector">
+<input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}-1" type="checkbox" name="event-offer-${id}" ${checked}>
 <label class="event__offer-label" for="event-offer-${id}-1">
   <span class="event__offer-title">${title}</span>
   &plus;&euro;&nbsp;
   <span class="event__offer-price">${price}</span>
 </label>
 </div>`);
-const getOfferList = (offers) => offers.map((offer)=>createOfferElement(offer)).join('');
+const getOfferList = (offersByType, offerIds) => offersByType.map((offer)=>{
+  const checked = offerIds.includes(offer.id) ? 'checked': '';
+  return createOfferElement(offer, checked);}
+).join('');
 
 const createPictureElement = ({src, description}) => (`<img class="event__photo" src="${src}" alt="${description}">`);
 const getPicturesList = (pictures) => pictures.map((picture)=>createPictureElement(picture)).join('');
@@ -43,11 +46,15 @@ const createAddEditPointTemplate = (offers, point = BasePoint,) =>{
     dateFrom,
     dateTo,
     destination: {description, name, pictures},
+    offers: offerIds,
     type
   } = point;
   const dateFromFormated = formatDate(dateFrom, PointFormat.DAY);
   const dateToFormated = formatDate(dateTo, PointFormat.DAY);
+
   const getOffersByType = offers.find((offer) => offer.type === type).offers;
+
+
   return (
     `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
@@ -101,7 +108,7 @@ const createAddEditPointTemplate = (offers, point = BasePoint,) =>{
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
         <div class="event__available-offers">
-          ${getOfferList(getOffersByType)}
+          ${getOfferList(getOffersByType, offerIds)}
         </div>
       </section>
     ${ name === '' ? '' : (`<section class="event__section  event__section--destination">
