@@ -128,24 +128,28 @@ const createAddEditPointTemplate = (offers, point = BasePoint,) =>{
   );};
 
 export default class AddEditPointView {
-  constructor(offers, point) {
-    this.point = point;
-    this.offers = offers;
+  #element = null;
+  #point = null;
+  #offers = null;
+
+  constructor(point, offers) {
+    this.#point = point;
+    this.#offers = offers;
   }
 
-  getTemplate(){
-    return createAddEditPointTemplate(this.offers, this.point);
+  get template(){
+    return createAddEditPointTemplate(this.#offers, this.#point);
   }
 
-  getElement(){
-    if(!this.element){
-      this.element = createElement(this.getTemplate());
+  get element(){
+    if(!this.#element){
+      this.#element = createElement(this.template);
     }
-    return this.element;
+    return this.#element;
   }
 
   removeElement(){
-    this.element = null;
+    this.#element = null;
   }
 
 }

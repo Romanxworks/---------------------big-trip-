@@ -2,7 +2,7 @@ import {createElement} from '../render';
 import { formatDate, getDifferentDate } from '../utils';
 import { PointFormat } from '../const';
 
-const createPointTemplate = (point, offers) =>{
+const createPointTemplate = (offers, point) =>{
   const {basePrice, dateFrom, dateTo, destination, offers: offerIds, isFavorite, type} = point;
   const diffTime = getDifferentDate(dateTo, dateFrom);
   const getOffersByType = offers.find((offer) => offer.type === type).offers;
@@ -53,24 +53,28 @@ const createPointTemplate = (point, offers) =>{
   );};
 
 export default class PointView {
-  constructor(point, offers) {
-    this.point = point;
-    this.offers = offers;
+  #element = null;
+  #point = null;
+  #offers = null;
+
+  constructor( point, offers) {
+    this.#point = point;
+    this.#offers = offers;
   }
 
-  getTemplate(){
-    return createPointTemplate(this.point, this.offers);
+  get template(){
+    return createPointTemplate(this.#offers, this.#point);
   }
 
-  getElement(){
-    if(!this.element){
-      this.element = createElement(this.getTemplate());
+  get element(){
+    if(!this.#element){
+      this.#element = createElement(this.template);
     }
-    return this.element;
+    return this.#element;
   }
 
   removeElement(){
-    this.element = null;
+    this.#element = null;
   }
 
 }
