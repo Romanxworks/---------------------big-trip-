@@ -1,4 +1,4 @@
-import {render} from '../render.js';
+import {render, replace} from '../framework/render.js';
 import PointsListView from '../view/points-list-view.js';
 import SortListView from '../view/sort-list-view.js';
 import AddEditPointView from '../view/add-edit-point-view.js';
@@ -27,13 +27,9 @@ export default class EventsPresenter{
     const pointView = new PointView(point, this.#offersList);
     const addEditView = new AddEditPointView(point, this.#offersList);
 
-    const replaceCardToForm = () => {
-      this.#eventsComponent.element.replaceChild(addEditView.element, pointView.element);
-    };
+    const replaceCardToForm = () => replace(addEditView, pointView);
 
-    const replaceFormToCard = () => {
-      this.#eventsComponent.element.replaceChild(pointView.element, addEditView.element);
-    };
+    const replaceFormToCard = () => replace(pointView, addEditView);
 
     const onEscKeyDown = (evt) => {
       if (evt.key === 'Escape' || evt.key === 'Esc') {
@@ -43,18 +39,17 @@ export default class EventsPresenter{
       }
     };
 
-    pointView.element.querySelector('.event__rollup-btn').addEventListener('click', ()=>{
+    pointView.setEditClickHandler(()=>{
       replaceCardToForm();
       document.addEventListener('keydown', onEscKeyDown);
     });
 
-    addEditView.element.querySelector('form').addEventListener('submit', (evt)=>{
-      evt.preventDefault();
+    addEditView.setFormSubmitHandler(()=>{
       replaceFormToCard();
       document.removeEventListener('keydown', onEscKeyDown);
     });
 
-    addEditView.element.querySelector('.event__reset-btn').addEventListener('click',()=>{
+    addEditView.setResetClickHandler(()=>{
       replaceFormToCard();
       document.removeEventListener('keydown', onEscKeyDown);
     });

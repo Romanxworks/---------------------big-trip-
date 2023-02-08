@@ -1,8 +1,7 @@
-import {createElement} from '../render';
+import AbstractView from '../framework/view/abstract-view.js';
 import {TYPES, CITIES} from '../const.js';
-import {formatDate} from '../utils';
+import {formatDate, getDayFrom, getDayTo} from '../utils/date.js';
 import {PointFormat} from '../const.js';
-import dayjs from 'dayjs';
 
 const createEventTypeElement = (type) => (`<div class="event__type-item">
   <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
@@ -29,10 +28,10 @@ const getOfferList = (offersByType, offerIds) => offersByType.map((offer)=>{
 const createPictureElement = ({src, description}) => (`<img class="event__photo" src="${src}" alt="${description}">`);
 const getPicturesList = (pictures) => pictures.map((picture)=>createPictureElement(picture)).join('');
 
-const BasePoint = {
+const BASE_POINT = {
   basePrice:'100',
-  dateFrom: dayjs(),
-  dateTo: dayjs(),
+  dateFrom: getDayFrom(),
+  dateTo: getDayTo(),
   destination: {
     description: '',
     name: '',
@@ -40,7 +39,7 @@ const BasePoint = {
   },
   type: 'taxi'
 };
-const createAddEditPointTemplate = (offers, point = BasePoint,) =>{
+const createAddEditPointTemplate = (offers, point) =>{
   const {
     basePrice,
     dateFrom,
@@ -127,12 +126,12 @@ const createAddEditPointTemplate = (offers, point = BasePoint,) =>{
 </li>`
   );};
 
-export default class AddEditPointView {
-  #element = null;
+export default class AddEditPointView extends AbstractView{
   #point = null;
   #offers = null;
 
-  constructor(point, offers) {
+  constructor(point = BASE_POINT, offers) {
+    super();
     this.#point = point;
     this.#offers = offers;
   }
@@ -141,15 +140,24 @@ export default class AddEditPointView {
     return createAddEditPointTemplate(this.#offers, this.#point);
   }
 
-  get element(){
-    if(!this.#element){
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
+  setFormSubmitHandler = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
+  };
 
-  removeElement(){
-    this.#element = null;
-  }
+  setResetClickHandler = (callback) => {
+    this._callback.formReset = callback;
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formResetHandler);
+  };
+
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  };
+
+  #formResetHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formReset();
+  };
 
 }

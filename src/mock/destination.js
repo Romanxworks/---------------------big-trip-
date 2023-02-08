@@ -1,4 +1,4 @@
-import {getRandomInteger, generateRandomValue} from '../utils.js';
+import {getRandomInteger, generateRandomValue} from '../utils/utils.js';
 import {CITIES, DESCRIPTIONS} from '../const';
 
 const createPicture = () =>({

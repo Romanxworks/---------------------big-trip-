@@ -1,5 +1,4 @@
-import { setId } from '../utils.js';
-import {getRandomInteger, generateRandomValue} from '../utils.js';
+import {getRandomInteger, generateRandomValue, setId} from '../utils/utils.js';
 import {TYPES, TITLES} from '../const';
 
 const createElementOffer = () =>({

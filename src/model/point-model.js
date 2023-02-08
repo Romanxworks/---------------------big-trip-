@@ -1,6 +1,6 @@
 import { generatePoint } from '../mock/point.js';
 import { getMainOffers } from '../mock/offer.js';
-import { setId } from '../utils.js';
+import { setId } from '../utils/utils.js';
 
 export default class PointModel {
   #points = setId(Array.from({length: 20}, generatePoint));

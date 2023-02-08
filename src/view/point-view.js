@@ -1,5 +1,5 @@
-import {createElement} from '../render';
-import { formatDate, getDifferentDate } from '../utils';
+import AbstractView from '../framework/view/abstract-view.js';
+import { formatDate, getDifferentDate } from '../utils/date.js';
 import { PointFormat } from '../const';
 
 const createPointTemplate = (offers, point) =>{
@@ -52,12 +52,12 @@ const createPointTemplate = (offers, point) =>{
 </li>`
   );};
 
-export default class PointView {
-  #element = null;
+export default class PointView extends AbstractView{
   #point = null;
   #offers = null;
 
-  constructor( point, offers) {
+  constructor(point, offers) {
+    super();
     this.#point = point;
     this.#offers = offers;
   }
@@ -66,15 +66,14 @@ export default class PointView {
     return createPointTemplate(this.#offers, this.#point);
   }
 
-  get element(){
-    if(!this.#element){
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
+  setEditClickHandler = (callback) => {
+    this._callback.editClick = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
+  };
 
-  removeElement(){
-    this.#element = null;
-  }
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.editClick();
+  };
 
 }

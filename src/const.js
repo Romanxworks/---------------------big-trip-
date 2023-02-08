@@ -22,4 +22,10 @@ const  PointFormat = {
   DAY: 'DD/MM/YY HH:mm'
 };
 
-export{TYPES, CITIES, DESCRIPTIONS, TITLES, PointFormat};
+const FilterType = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PAST: 'past',
+};
+
+export{TYPES, CITIES, DESCRIPTIONS, TITLES, PointFormat, FilterType};
