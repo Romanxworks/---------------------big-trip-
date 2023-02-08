@@ -1,8 +1,8 @@
-import {createElement} from '../render';
-import { formatDate, getDifferentDate } from '../utils';
+import AbstractView from '../framework/view/abstract-view.js';
+import { formatDate, getDifferentDate } from '../utils/date.js';
 import { PointFormat } from '../const';
 
-const createPointTemplate = (point, offers) =>{
+const createPointTemplate = (offers, point) =>{
   const {basePrice, dateFrom, dateTo, destination, offers: offerIds, isFavorite, type} = point;
   const diffTime = getDifferentDate(dateTo, dateFrom);
   const getOffersByType = offers.find((offer) => offer.type === type).offers;
@@ -52,25 +52,28 @@ const createPointTemplate = (point, offers) =>{
 </li>`
   );};
 
-export default class PointView {
+export default class PointView extends AbstractView{
+  #point = null;
+  #offers = null;
+
   constructor(point, offers) {
-    this.point = point;
-    this.offers = offers;
+    super();
+    this.#point = point;
+    this.#offers = offers;
   }
 
-  getTemplate(){
-    return createPointTemplate(this.point, this.offers);
+  get template(){
+    return createPointTemplate(this.#offers, this.#point);
   }
 
-  getElement(){
-    if(!this.element){
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
+  setEditClickHandler = (callback) => {
+    this._callback.editClick = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
+  };
 
-  removeElement(){
-    this.element = null;
-  }
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.editClick();
+  };
 
 }

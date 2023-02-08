@@ -1,10 +1,10 @@
 import { generatePoint } from '../mock/point.js';
 import { getMainOffers } from '../mock/offer.js';
-import { setId } from '../utils.js';
+import { setId } from '../utils/utils.js';
 
 export default class PointModel {
-  points = setId(Array.from({length: 30}, generatePoint));
-  offers = getMainOffers();
-  getPoints = () => this.points;
-  getOffers = () => this.offers;
+  #points = setId(Array.from({length: 20}, generatePoint));
+  #offers = getMainOffers();
+  get points () { return this.#points; }
+  get offers () { return this.#offers; }
 }
