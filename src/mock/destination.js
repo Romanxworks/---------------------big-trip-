@@ -10,13 +10,13 @@ const createPicture = () =>({
 const generateDestination = () => ({
   description: generateRandomValue(DESCRIPTIONS),
   name: '',
-  pictures: Array.from({length:getRandomInteger(0,8)}, createPicture)
+  pictures: Array.from({length:getRandomInteger(1,8)}, createPicture)
 });
 
 export const getDestinations = () => {
   const destinations = Array.from({length: CITIES.length}, generateDestination);
-  for(let i=0;i<CITIES.length;i++){
-    destinations[i].name = CITIES[i];
-  }
+  destinations.forEach((destination, index) => {
+    destination.name = CITIES[index];
+  });
   return destinations;
 };
