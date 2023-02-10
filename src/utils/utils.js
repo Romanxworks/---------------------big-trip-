@@ -5,10 +5,7 @@ const getRandomInteger = (a = 0, b = 1) => {
   return Math.floor(lower + Math.random() * (upper - lower + 1));
 };
 
-const generateRandomValue = (array) => {
-  const randomIndex = getRandomInteger(0, array.length - 1);
-  return array[randomIndex];
-};
+const generateRandomValue = (array) => array[getRandomInteger(0, array.length-1)];
 
 const generateRandomArrayNumber = (count) => {
   const newArr = Array.from({length: count}, ()=>getRandomInteger(1,5));

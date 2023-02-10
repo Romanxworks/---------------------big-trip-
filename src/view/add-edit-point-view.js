@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import {TYPES, CITIES} from '../const.js';
-import {formatDate, getDayFrom, getDayTo} from '../utils/date.js';
+import {formatDate, getRandomDay} from '../utils/date.js';
 import {PointFormat} from '../const.js';
 
 const createEventTypeElement = (type) => (`<div class="event__type-item">
@@ -30,8 +30,8 @@ const getPicturesList = (pictures) => pictures.map((picture)=>createPictureEleme
 
 const BASE_POINT = {
   basePrice:'100',
-  dateFrom: getDayFrom(),
-  dateTo: getDayTo(),
+  dateFrom: getRandomDay().dateFrom,
+  dateTo: getRandomDay().dateTo,
   destination: {
     description: '',
     name: '',
