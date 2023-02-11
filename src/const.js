@@ -28,4 +28,9 @@ const FilterType = {
   PAST: 'past',
 };
 
-export{TYPES, CITIES, DESCRIPTIONS, TITLES, PointFormat, FilterType};
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
+
+export{TYPES, CITIES, DESCRIPTIONS, TITLES, PointFormat, FilterType, Mode};

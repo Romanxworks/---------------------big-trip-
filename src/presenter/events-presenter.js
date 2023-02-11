@@ -1,16 +1,19 @@
-import {render, replace} from '../framework/render.js';
+import {render} from '../framework/render.js';
 import PointsListView from '../view/points-list-view.js';
 import SortListView from '../view/sort-list-view.js';
-import AddEditPointView from '../view/add-edit-point-view.js';
-import PointView from '../view/point-view.js';
 import ListEmptyView from '../view/list-empty-view.js';
+import PointPresenter from './point-presenter.js';
+import { updateItem } from '../utils/utils.js';
 
 export default class EventsPresenter{
   #eventsComponent = new PointsListView();
+  #sortList = new SortListView();
+  #listEmpty = new ListEmptyView();
   #eventsContainer = null;
   #pointModel = null;
   #pointsList  = [];
   #offersList = [];
+  #pointPresenter = new Map();
 
   constructor(eventsContainer, pointModel){
     this.#eventsContainer = eventsContainer;
@@ -23,54 +26,45 @@ export default class EventsPresenter{
     this.#renderPointList();
   };
 
-  #renderPoint(point){
-    const pointView = new PointView(point, this.#offersList);
-    const addEditView = new AddEditPointView(point, this.#offersList);
+  #renderPoint = (point) => {
+    const pointPresenter = new PointPresenter(this.#eventsComponent.element, this.#handlePointChange, this.#handleModeChange);
+    pointPresenter.init(point, this.#offersList);
+    this.#pointPresenter.set(point.id, pointPresenter);
+  };
 
-    const replaceCardToForm = () => replace(addEditView, pointView);
+  #renderPoints = () => {
+    this.#pointsList.forEach((point)=>this.#renderPoint(point));
+  };
 
-    const replaceFormToCard = () => replace(pointView, addEditView);
-
-    const onEscKeyDown = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        replaceFormToCard();
-        document.removeEventListener('keydown', onEscKeyDown);
-      }
-    };
-
-    pointView.setEditClickHandler(()=>{
-      replaceCardToForm();
-      document.addEventListener('keydown', onEscKeyDown);
-    });
-
-    addEditView.setFormSubmitHandler(()=>{
-      replaceFormToCard();
-      document.removeEventListener('keydown', onEscKeyDown);
-    });
-
-    addEditView.setResetClickHandler(()=>{
-      replaceFormToCard();
-      document.removeEventListener('keydown', onEscKeyDown);
-    });
-
-
-    render(pointView, this.#eventsComponent.element);
-  }
-
-  #renderPointList(){
-
+  #renderPointList = () => {
     if(this.#pointsList.length<1){
-      render(new ListEmptyView(), this.#eventsContainer);
+      this.#renderListEmpty();
       return;
     }
-
-    render(new SortListView(), this.#eventsContainer);
     render(this.#eventsComponent, this.#eventsContainer);
+    this.#renderSort();
+    this.#renderPoints();
+  };
 
-    for (let i = 0; i < this.#pointsList.length; i++) {
-      this.#renderPoint(this.#pointsList[i]);
-    }
+  #renderSort = () => {
+    render(this.#sortList, this.#eventsContainer);
+  };
 
-  }
+  #renderListEmpty = () => {
+    render(this.#listEmpty, this.#eventsContainer);
+  };
+
+  #clearPointList = () => {
+    this.#pointPresenter.forEach((presenter) => presenter.destroy());
+    this.#pointPresenter.clear();
+  };
+
+  #handlePointChange = (updatedPoint) => {
+    this.#pointsList = updateItem(this.#pointsList, updatedPoint);
+    this.#pointPresenter.get(updatedPoint.id).init(updatedPoint, this.#offersList);
+  };
+
+  #handleModeChange = () => {
+    this.#pointPresenter.forEach((presenter) => presenter.resetView());
+  };
 }
