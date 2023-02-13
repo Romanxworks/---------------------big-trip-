@@ -3,7 +3,9 @@ import PointsListView from '../view/points-list-view.js';
 import SortListView from '../view/sort-list-view.js';
 import ListEmptyView from '../view/list-empty-view.js';
 import PointPresenter from './point-presenter.js';
-import { updateItem } from '../utils/utils.js';
+import {updateItem} from '../utils/utils.js';
+import {sortByPrice, sortByTime, sortByDay} from '../utils/sort.js';
+import {SortType} from '../const.js';
 
 export default class EventsPresenter{
   #eventsComponent = new PointsListView();
@@ -14,6 +16,8 @@ export default class EventsPresenter{
   #pointsList  = [];
   #offersList = [];
   #pointPresenter = new Map();
+  #currentSortType = SortType.DAY;
+  #sourcedPoints = [];
 
   constructor(eventsContainer, pointModel){
     this.#eventsContainer = eventsContainer;
@@ -21,8 +25,9 @@ export default class EventsPresenter{
   }
 
   init = () => {
-    this.#pointsList  = [...this.#pointModel.points];
+    this.#pointsList  = [...this.#pointModel.points].sort(sortByDay);
     this.#offersList = [...this.#pointModel.offers];
+    this.#sourcedPoints = [...this.#pointModel.points].slice().sort(sortByDay);
     this.#renderPointList();
   };
 
@@ -41,17 +46,22 @@ export default class EventsPresenter{
       this.#renderListEmpty();
       return;
     }
-    render(this.#eventsComponent, this.#eventsContainer);
     this.#renderSort();
+    this.#renderEventList();
     this.#renderPoints();
   };
 
   #renderSort = () => {
+    this.#sortList.setClickSortHandler(this.#handleSortTypeChange);
     render(this.#sortList, this.#eventsContainer);
   };
 
   #renderListEmpty = () => {
     render(this.#listEmpty, this.#eventsContainer);
+  };
+
+  #renderEventList = () => {
+    render(this.#eventsComponent, this.#eventsContainer);
   };
 
   #clearPointList = () => {
@@ -61,10 +71,37 @@ export default class EventsPresenter{
 
   #handlePointChange = (updatedPoint) => {
     this.#pointsList = updateItem(this.#pointsList, updatedPoint);
+    this.#currentSortType = updateItem(this.#sourcedPoints, updatedPoint);
     this.#pointPresenter.get(updatedPoint.id).init(updatedPoint, this.#offersList);
   };
 
   #handleModeChange = () => {
     this.#pointPresenter.forEach((presenter) => presenter.resetView());
+  };
+
+  #sortPoints = (sortType) => {
+    switch (sortType) {
+      case SortType.TIME:
+        this.#pointsList.sort(sortByTime);
+        break;
+      case SortType.PRICE:
+        this.#pointsList.sort(sortByPrice);
+        break;
+      default:
+        this.#pointsList = [...this.#sourcedPoints];
+    }
+
+    this.#currentSortType = sortType;
+  };
+
+  #handleSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#sortPoints(sortType);
+    this.#clearPointList();
+    this.#renderPoints();
+
   };
 }

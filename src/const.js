@@ -33,4 +33,12 @@ const Mode = {
   EDITING: 'EDITING',
 };
 
-export{TYPES, CITIES, DESCRIPTIONS, TITLES, PointFormat, FilterType, Mode};
+const SORT_TYPES = ['day', 'event', 'time', 'price', 'offer'];
+
+const SortType = {
+  DAY: 'day',
+  TIME: 'time',
+  PRICE: 'price',
+};
+
+export{TYPES, CITIES, DESCRIPTIONS, TITLES, PointFormat, FilterType, Mode, SORT_TYPES, SortType};
