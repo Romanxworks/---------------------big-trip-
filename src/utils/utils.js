@@ -19,16 +19,30 @@ const generateRandomArrayNumber = (count) => {
 };
 
 const setId = (array) => {
-  for(let i=0; i< array.length; i++){
-    array[i].id = i;
-  }
+  array.forEach((element, index) => {
+    element.id = index;
+  });
   return array;
 };
 
+const updateItem = (items, update) => {
+  const index = items.findIndex((item) => item.id === update.id);
+
+  if (index === -1) {
+    return items;
+  }
+
+  return [
+    ...items.slice(0, index),
+    update,
+    ...items.slice(index + 1),
+  ];
+};
 
 export {
   getRandomInteger,
   generateRandomValue,
   generateRandomArrayNumber,
-  setId
+  setId,
+  updateItem
 };
