@@ -15,6 +15,7 @@ export default class EventsPresenter{
   #pointModel = null;
   #pointsList  = [];
   #offersList = [];
+  #destinations = [];
   #pointPresenter = new Map();
   #currentSortType = SortType.DAY;
   #sourcedPoints = [];
@@ -27,13 +28,14 @@ export default class EventsPresenter{
   init = () => {
     this.#pointsList  = [...this.#pointModel.points].sort(sortByDay);
     this.#offersList = [...this.#pointModel.offers];
-    this.#sourcedPoints = [...this.#pointModel.points].slice().sort(sortByDay);
+    this.#destinations = [...this.#pointModel.destinations];
+    this.#sourcedPoints = [...this.#pointModel.points].sort(sortByDay);
     this.#renderPointList();
   };
 
   #renderPoint = (point) => {
     const pointPresenter = new PointPresenter(this.#eventsComponent.element, this.#handlePointChange, this.#handleModeChange);
-    pointPresenter.init(point, this.#offersList);
+    pointPresenter.init(point, this.#offersList, this.#destinations);
     this.#pointPresenter.set(point.id, pointPresenter);
   };
 

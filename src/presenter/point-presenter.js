@@ -12,6 +12,7 @@ export default class PointPresenter {
 
   #point = null;
   #offers = null;
+  #destinations = null;
   #mode = Mode.DEFAULT;
 
   constructor(ponitListContainer, changeData, changeMode){
@@ -20,20 +21,21 @@ export default class PointPresenter {
     this.#changeMode = changeMode;
   }
 
-  init = (point, offers) => {
+  init = (point, offers, destinations) => {
     this.#point = point;
     this.#offers = offers;
+    this.#destinations = destinations;
 
     const prevPointComponent = this.#pointComponent;
     const prevAddEditComponent = this.#addEditComponent;
 
     this.#pointComponent = new PointView(this.#point, this.#offers);
-    this.#addEditComponent = new AddEditPointView(this.#point, this.#offers);
+    this.#addEditComponent = new AddEditPointView(this.#offers, this.#destinations, this.#point);
 
     this.#pointComponent.setEditClickHandler(this.#handleEditClick);
     this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
     this.#addEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
-    this.#addEditComponent.setResetClickHandler(this.#handleResetClickHandler);
+    this.#addEditComponent.setResetClickHandler(this.resetView);
 
     if (prevPointComponent === null || prevAddEditComponent === null) {
       render(this.#pointComponent, this.#ponitListContainer);
@@ -60,6 +62,7 @@ export default class PointPresenter {
 
   resetView = () => {
     if (this.#mode !== Mode.DEFAULT) {
+      this.#addEditComponent.reset(this.#point);
       this.#replaceFormToCard();
     }
   };
@@ -80,6 +83,7 @@ export default class PointPresenter {
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
+      this.#addEditComponent.reset(this.#point);
       this.#replaceFormToCard();
     }
   };
@@ -90,10 +94,6 @@ export default class PointPresenter {
 
   #handleFormSubmit = (point) => {
     this.#changeData(point);
-    this.#replaceFormToCard();
-  };
-
-  #handleResetClickHandler = () => {
     this.#replaceFormToCard();
   };
 
