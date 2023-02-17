@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 const TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
 const CITIES = ['Moscow', 'Saint-Petersburg', 'Voronezh', 'Belgorod', 'Volgograd', 'Gelendzhik', 'Krasnodar'];
@@ -41,4 +43,19 @@ const SortType = {
   PRICE: 'price',
 };
 
-export{TYPES, CITIES, DESCRIPTIONS, TITLES, PointFormat, FilterType, Mode, SORT_TYPES, SortType};
+const BASE_DESTINATION = {
+  description: '',
+  name: '',
+  pictures: []
+};
+
+const BASE_POINT = {
+  basePrice:'100',
+  dateFrom: dayjs().format(),
+  dateTo: dayjs().format(),
+  destination: BASE_DESTINATION,
+  type: 'taxi',
+  isNew: true
+};
+
+export{TYPES, CITIES, DESCRIPTIONS, TITLES, PointFormat, FilterType, Mode, SORT_TYPES, SortType, BASE_POINT, BASE_DESTINATION};
