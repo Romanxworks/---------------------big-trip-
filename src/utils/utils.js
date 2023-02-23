@@ -25,18 +25,13 @@ const setId = (array) => {
   return array;
 };
 
-const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if (index === -1) {
-    return items;
+const addDeleteValue = (value, array) => {
+  const newVal = Number(value);
+  if(array.includes(newVal)){
+    return array.filter((val) => val !== newVal);
   }
-
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1),
-  ];
+  array.push(newVal);
+  return array;
 };
 
 export {
@@ -44,5 +39,5 @@ export {
   generateRandomValue,
   generateRandomArrayNumber,
   setId,
-  updateItem
+  addDeleteValue
 };

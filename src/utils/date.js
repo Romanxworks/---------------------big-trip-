@@ -44,10 +44,18 @@ const getRandomDay = () => {
 
 };
 
+const isDateEqual = (point, update) => {
+  const isDateFromEqual = dayjs(point.dateFrom).isSame(dayjs(update.dateFrom), 'minute');
+  const isDateToEqual = dayjs(point.dateTo).isSame(dayjs(update.dateTo), 'minute');
+
+  return isDateFromEqual && isDateToEqual;
+};
+
 export {
   formatDate,
   getDifferentDate,
   isPastDate,
   isFutureDate,
-  getRandomDay
+  getRandomDay,
+  isDateEqual
 };

@@ -58,4 +58,29 @@ const BASE_POINT = {
   isNew: true
 };
 
-export{TYPES, CITIES, DESCRIPTIONS, TITLES, PointFormat, FilterType, Mode, SORT_TYPES, SortType, BASE_POINT, BASE_DESTINATION};
+const UserAction = {
+  ADD_POINT: 'ADD_POINT',
+  UPDATE_POINT: 'UPDATE_POINT',
+  DELETE_POINT: 'ELETE_POINT'
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+export{TYPES,
+  CITIES,
+  DESCRIPTIONS,
+  TITLES,
+  PointFormat,
+  FilterType,
+  Mode,
+  SORT_TYPES,
+  SortType,
+  BASE_POINT,
+  BASE_DESTINATION,
+  UserAction,
+  UpdateType
+};
