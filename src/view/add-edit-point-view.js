@@ -141,7 +141,12 @@ export default class AddEditPointView extends AbstractStatefulView{
 
   static parsePointToState = (point) => ({...point});
 
-  static parseStateToPoint = (state) => ({...state});
+  static parseStateToPoint = (state) => {
+    if(state.isNew){
+      delete state.isNew;
+    }
+    return {...state};
+  };
 
   _restoreHandlers = () => {
     this.#setInnerHandlers();
@@ -251,7 +256,7 @@ export default class AddEditPointView extends AbstractStatefulView{
   };
 
   #dateFromChangeHandler = ([userDateFrom]) => {
-    this._setState({
+    this.updateElement({
       dateFrom: userDateFrom.toISOString(),
     });
   };
@@ -272,7 +277,7 @@ export default class AddEditPointView extends AbstractStatefulView{
   };
 
   #dateToChangeHandler = ([userDateTo]) =>{
-    this._setState({
+    this.updateElement({
       dateTo: userDateTo.toISOString(),
     });
   };

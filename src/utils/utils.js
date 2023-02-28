@@ -25,7 +25,7 @@ const setId = (array) => {
   return array;
 };
 
-const addDeleteValue = (value, array) => {
+const addDeleteValue = (value, array = []) => {
   const newVal = Number(value);
   if(array.includes(newVal)){
     return array.filter((val) => val !== newVal);

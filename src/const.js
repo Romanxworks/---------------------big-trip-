@@ -51,11 +51,12 @@ const BASE_DESTINATION = {
 
 const BASE_POINT = {
   basePrice:'100',
-  dateFrom: dayjs().format(),
-  dateTo: dayjs().format(),
+  dateFrom: dayjs().toISOString(),
+  dateTo: dayjs().add(30, 'minute').toISOString(),
   destination: BASE_DESTINATION,
   type: 'taxi',
-  isNew: true
+  isNew: true,
+  offers: []
 };
 
 const UserAction = {
@@ -70,6 +71,7 @@ const UpdateType = {
   MAJOR: 'MAJOR',
 };
 
+const MIN_POINTS_COUNT = 3;
 export{TYPES,
   CITIES,
   DESCRIPTIONS,
@@ -82,5 +84,6 @@ export{TYPES,
   BASE_POINT,
   BASE_DESTINATION,
   UserAction,
-  UpdateType
+  UpdateType,
+  MIN_POINTS_COUNT
 };
