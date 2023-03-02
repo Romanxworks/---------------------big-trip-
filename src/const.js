@@ -51,11 +51,39 @@ const BASE_DESTINATION = {
 
 const BASE_POINT = {
   basePrice:'100',
-  dateFrom: dayjs().format(),
-  dateTo: dayjs().format(),
+  dateFrom: dayjs().toISOString(),
+  dateTo: dayjs().add(30, 'minute').toISOString(),
   destination: BASE_DESTINATION,
   type: 'taxi',
-  isNew: true
+  isNew: true,
+  offers: []
 };
 
-export{TYPES, CITIES, DESCRIPTIONS, TITLES, PointFormat, FilterType, Mode, SORT_TYPES, SortType, BASE_POINT, BASE_DESTINATION};
+const UserAction = {
+  ADD_POINT: 'ADD_POINT',
+  UPDATE_POINT: 'UPDATE_POINT',
+  DELETE_POINT: 'ELETE_POINT'
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+const MIN_POINTS_COUNT = 3;
+export{TYPES,
+  CITIES,
+  DESCRIPTIONS,
+  TITLES,
+  PointFormat,
+  FilterType,
+  Mode,
+  SORT_TYPES,
+  SortType,
+  BASE_POINT,
+  BASE_DESTINATION,
+  UserAction,
+  UpdateType,
+  MIN_POINTS_COUNT
+};

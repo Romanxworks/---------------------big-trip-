@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { formatDate, getDifferentDate } from '../utils/date.js';
-import { PointFormat } from '../const';
+import {formatDate, getDifferentDate} from '../utils/date.js';
+import {PointFormat} from '../const';
 
 const createPointTemplate = (offers, point) =>{
   const {basePrice, dateFrom, dateTo, destination, offers: offerIds, isFavorite, type} = point;

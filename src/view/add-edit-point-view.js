@@ -1,7 +1,7 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import {TYPES, CITIES} from '../const.js';
 import {formatDate} from '../utils/date.js';
-import {PointFormat, BASE_DESTINATION, BASE_POINT} from '../const.js';
+import {addDeleteValue} from '../utils/utils.js';
+import {PointFormat, BASE_DESTINATION, BASE_POINT, TYPES, CITIES} from '../const.js';
 import flatpickr from 'flatpickr';
 
 import 'flatpickr/dist/flatpickr.min.css';
@@ -89,7 +89,7 @@ const createAddEditPointTemplate = (offers, point) =>{
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+        <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${basePrice}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabledSubmit ? 'disabled' : ''}>Save</button>
@@ -141,13 +141,18 @@ export default class AddEditPointView extends AbstractStatefulView{
 
   static parsePointToState = (point) => ({...point});
 
-  static parseStateToPoint = (state) => ({...state});
+  static parseStateToPoint = (state) => {
+    if(state.isNew){
+      delete state.isNew;
+    }
+    return {...state};
+  };
 
   _restoreHandlers = () => {
     this.#setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setResetClickHandler(this._callback.formReset);
-
+    this.setDeleteClickHandler(this._callback.deleteClick);
   };
 
   reset = (point) => {
@@ -167,6 +172,11 @@ export default class AddEditPointView extends AbstractStatefulView{
     this.element.querySelector(resetButtonClass).addEventListener('click', this.#formResetHandler);
   };
 
+  setDeleteClickHandler = (callback) => {
+    this._callback.deleteClick = callback;
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#deleteClickHandler);
+  };
+
   removeElement = () => {
     super.removeElement();
 
@@ -180,6 +190,7 @@ export default class AddEditPointView extends AbstractStatefulView{
     this.element.querySelector('.event__type-group').addEventListener('change', this.#typeChangeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#nameChangeHandler);
     this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChangeHandler);
+    this.element.querySelector('.event__available-offers').addEventListener('change', this.#offerChangeHandler);
     this.#setDatepickerDateFrom();
     this.#setDatepickerDateTo();
   };
@@ -189,7 +200,8 @@ export default class AddEditPointView extends AbstractStatefulView{
     this._callback.formSubmit(AddEditPointView.parseStateToPoint(this._state));
   };
 
-  #formResetHandler = () => {
+  #formResetHandler = (evt) => {
+    evt.preventDefault();
     this._callback.formReset();
   };
 
@@ -210,9 +222,22 @@ export default class AddEditPointView extends AbstractStatefulView{
 
   #priceChangeHandler = (evt) => {
     evt.preventDefault();
-    this.updateElement({
+    this._setState({
       basePrice: evt.target.value,
     });
+  };
+
+  #offerChangeHandler = (evt) => {
+    const offerId = evt.target.name.slice(evt.target.name.length-1);
+    const newOffers = addDeleteValue(offerId, [...this._state.offers]);
+    this._setState({
+      offers: newOffers,
+    });
+  };
+
+  #deleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.deleteClick(AddEditPointView.parseStateToPoint(this._state));
   };
 
   #setDatepickerDateFrom = () => {
@@ -225,7 +250,7 @@ export default class AddEditPointView extends AbstractStatefulView{
         dateFormat: 'YYYY-MM-DDTHH:mm:ss.sssZ',
         maxDate: this._state.dateTo,
         defaultDate: this._state.dateFrom,
-        onChange: this.#dateFromChangeHandler,
+        onClose: this.#dateFromChangeHandler,
       },
     );
   };
@@ -246,7 +271,7 @@ export default class AddEditPointView extends AbstractStatefulView{
         dateFormat: 'YYYY-MM-DDTHH:mm:ss.sssZ',
         minDate: this._state.dateFrom,
         defaultDate: this._state.dateTo,
-        onChange: this.#dateToChangeHandler,
+        onClose: this.#dateToChangeHandler,
       },
     );
   };

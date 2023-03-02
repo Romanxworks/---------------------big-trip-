@@ -1,7 +1,8 @@
 import {render, replace, remove} from '../framework/render.js';
 import PointView from '../view/point-view.js';
 import AddEditPointView from '../view/add-edit-point-view.js';
-import {Mode} from '../const.js';
+import {UserAction, UpdateType, Mode} from '../const.js';
+import {isDateEqual} from '../utils/date.js';
 
 export default class PointPresenter {
   #ponitListContainer = null;
@@ -36,6 +37,7 @@ export default class PointPresenter {
     this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
     this.#addEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#addEditComponent.setResetClickHandler(this.resetView);
+    this.#addEditComponent.setDeleteClickHandler(this.#handleDeleteClick);
 
     if (prevPointComponent === null || prevAddEditComponent === null) {
       render(this.#pointComponent, this.#ponitListContainer);
@@ -92,13 +94,31 @@ export default class PointPresenter {
     this.#replaceCardToForm();
   };
 
-  #handleFormSubmit = (point) => {
-    this.#changeData(point);
+  #handleFormSubmit = (update) => {
+    const isMinorUpdate = !isDateEqual(this.#point, update) || this.#point.basePrice !== update.basePrice;
+
+    this.#changeData(
+      UserAction.UPDATE_POINT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      update
+    );
     this.#replaceFormToCard();
   };
 
   #handleFavoriteClick = () => {
-    this.#changeData({...this.#point, isFavorite: !this.#point.isFavorite});
+    this.#changeData(
+      UserAction.UPDATE_POINT,
+      UpdateType.PATCH,
+      {...this.#point, isFavorite: !this.#point.isFavorite}
+    );
+  };
+
+  #handleDeleteClick = (point) => {
+    this.#changeData(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point
+    );
   };
 
 }

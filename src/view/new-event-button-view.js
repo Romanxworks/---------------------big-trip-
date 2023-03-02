@@ -13,9 +13,12 @@ export default class NewEventButtonView extends AbstractView{
     this.element.addEventListener('click', this.#clickHandler);
   };
 
+  setActiveButton = () => {this.element.disabled = false;};
+
   #clickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.click();
+    this.element.disabled = true;
+    this._callback.click(this.setActiveButton);
   };
 
 }
