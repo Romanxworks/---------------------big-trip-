@@ -34,10 +34,21 @@ const addDeleteValue = (value, array = []) => {
   return array;
 };
 
+const getCities = (destinations) => {
+  const cities = [];
+  destinations.forEach((destination) => {
+    if(!cities.includes(destination.name)){
+      cities.push(destination.name);
+    }
+  });
+  return cities;
+};
+
 export {
   getRandomInteger,
   generateRandomValue,
   generateRandomArrayNumber,
   setId,
-  addDeleteValue
+  addDeleteValue,
+  getCities
 };

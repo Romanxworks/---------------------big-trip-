@@ -50,11 +50,12 @@ const BASE_DESTINATION = {
 };
 
 const BASE_POINT = {
-  basePrice:'100',
+  basePrice: 100,
   dateFrom: dayjs().toISOString(),
   dateTo: dayjs().add(30, 'minute').toISOString(),
   destination: BASE_DESTINATION,
   type: 'taxi',
+  isFavorite:false,
   isNew: true,
   offers: []
 };
@@ -69,6 +70,7 @@ const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 const MIN_POINTS_COUNT = 3;

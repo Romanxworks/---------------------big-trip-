@@ -1,13 +1,20 @@
 import {render, remove} from '../framework/render.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import PointsListView from '../view/points-list-view.js';
 import SortListView from '../view/sort-list-view.js';
 import ListEmptyView from '../view/list-empty-view.js';
+import LoadingView from '../view/loading-view.js';
 import PointPresenter from './point-presenter.js';
 import {sortByPrice, sortByTime, sortByDay} from '../utils/sort.js';
+import {getCities} from '../utils/utils.js';
 import {SortType, UserAction, UpdateType, FilterType} from '../const.js';
 import {filter} from '../utils/filter.js';
 import PointNewPresenter from './point-new-presenter.js';
 
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 export default class EventsPresenter{
   #eventsComponent = new PointsListView();
   #sortList = null;
@@ -15,12 +22,13 @@ export default class EventsPresenter{
   #eventsContainer = null;
   #pointModel = null;
   #headerModel = null;
-  #offersList = [];
-  #destinations = [];
+  #loadingComponent = new LoadingView();
   #pointPresenter = new Map();
   #currentSortType = SortType.DAY;
   #filterType = FilterType.EVERYTHING;
   #pointNewPresenter = null;
+  #isLoading = true;
+  #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
 
   constructor(eventsContainer, pointModel, headerModel){
     this.#eventsContainer = eventsContainer;
@@ -33,8 +41,6 @@ export default class EventsPresenter{
   }
 
   init = () => {
-    this.#offersList = [...this.#pointModel.offers];
-    this.#destinations = [...this.#pointModel.destinations];
     this.#renderPointList();
   };
 
@@ -53,26 +59,40 @@ export default class EventsPresenter{
     }
   }
 
+  get offers() {
+    return this.#pointModel.offers;
+  }
+
+  get destinations() {
+    return this.#pointModel.destinations;
+  }
+
   createPoint = (callback) => {
     this.#currentSortType = SortType.DAY;
     this.#headerModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this.#pointNewPresenter.init(this.#offersList, this.#destinations, callback);
+    this.#pointNewPresenter.init(this.offers, this.destinations, callback);
   };
 
-  #renderPoint = (point) => {
+  #renderPoint = (point, cities) => {
     const pointPresenter = new PointPresenter(this.#eventsComponent.element, this.#handleViewAction, this.#handleModeChange);
-    pointPresenter.init(point, this.#offersList, this.#destinations);
+    pointPresenter.init(point, this.offers, this.destinations, cities);
     this.#pointPresenter.set(point.id, pointPresenter);
   };
 
   #renderPoints = (ponts) => {
-    ponts.forEach((point)=>this.#renderPoint(point));
+    const cities = getCities(this.destinations);
+    ponts.forEach((point)=>this.#renderPoint(point, cities));
   };
 
   #renderPointList = () => {
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
     const points = this.points;
+    const pointsCount = points.length;
 
-    if(points.length < 1){
+    if(pointsCount === 0){
       this.#renderListEmpty();
       return;
     }
@@ -93,6 +113,10 @@ export default class EventsPresenter{
     render(this.#listEmpty, this.#eventsContainer);
   };
 
+  #renderLoading = () => {
+    render(this.#loadingComponent, this.#eventsContainer);
+  };
+
   #renderEventList = () => {
     render(this.#eventsComponent, this.#eventsContainer);
   };
@@ -101,6 +125,7 @@ export default class EventsPresenter{
     this.#pointNewPresenter.destroy();
     this.#pointPresenter.forEach((presenter) => presenter.destroy());
     this.#pointPresenter.clear();
+    remove(this.#loadingComponent);
     remove(this.#sortList);
 
     if (this.#listEmpty) {
@@ -127,24 +152,41 @@ export default class EventsPresenter{
     this.#renderPointList();
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
     switch (actionType){
       case UserAction.ADD_POINT:
-        this.#pointModel.addPoint(updateType, update);
+        this.#pointNewPresenter.setSaving();
+        try {
+          await this.#pointModel.addPoint(updateType, update);
+        } catch(err) {
+          this.#pointNewPresenter.setAborting();
+        }
         break;
       case UserAction.UPDATE_POINT:
-        this.#pointModel.updatePoint(updateType, update);
+        this.#pointPresenter.get(update.id).setSaving();
+        try {
+          await this.#pointModel.updatePoint(updateType, update);
+        } catch(err) {
+          this.#pointPresenter.get(update.id).setAborting();
+        }
         break;
       case UserAction.DELETE_POINT:
-        this.#pointModel.deletePoint(updateType, update);
+        this.#pointPresenter.get(update.id).setDeleting();
+        try {
+          await this.#pointModel.deletePoint(updateType, update);
+        } catch(err) {
+          this.#pointPresenter.get(update.id).setAborting();
+        }
         break;
     }
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#pointPresenter.get(data.id).init(data, this.#offersList);
+        this.#pointPresenter.get(data.id).init(data, this.offers);
         break;
       case UpdateType.MINOR:
         this.#clearPointList();
@@ -152,6 +194,11 @@ export default class EventsPresenter{
         break;
       case UpdateType.MAJOR:
         this.#clearPointList(true);
+        this.#renderPointList();
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
         this.#renderPointList();
         break;
     }
