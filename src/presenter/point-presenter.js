@@ -14,6 +14,7 @@ export default class PointPresenter {
   #point = null;
   #offers = null;
   #destinations = null;
+  #sities = null;
   #mode = Mode.DEFAULT;
 
   constructor(ponitListContainer, changeData, changeMode){
@@ -22,16 +23,17 @@ export default class PointPresenter {
     this.#changeMode = changeMode;
   }
 
-  init = (point, offers, destinations) => {
+  init = (point, offers, destinations, sities) => {
     this.#point = point;
     this.#offers = offers;
     this.#destinations = destinations;
+    this.#sities = sities;
 
     const prevPointComponent = this.#pointComponent;
     const prevAddEditComponent = this.#addEditComponent;
 
     this.#pointComponent = new PointView(this.#point, this.#offers);
-    this.#addEditComponent = new AddEditPointView(this.#offers, this.#destinations, this.#point);
+    this.#addEditComponent = new AddEditPointView(this.#offers, this.#destinations, this.#sities, this.#point);
 
     this.#pointComponent.setEditClickHandler(this.#handleEditClick);
     this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
@@ -49,7 +51,8 @@ export default class PointPresenter {
     }
 
     if (this.#mode === Mode.EDITING) {
-      replace(this.#addEditComponent, prevAddEditComponent);
+      replace(this.#pointComponent, prevAddEditComponent);
+      this.#mode = Mode.DEFAULT;
     }
 
     remove(prevPointComponent);
@@ -67,6 +70,37 @@ export default class PointPresenter {
       this.#addEditComponent.reset(this.#point);
       this.#replaceFormToCard();
     }
+  };
+
+  setSaving = () => {
+    this.#addEditComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  };
+
+  setDeleting = () => {
+    this.#addEditComponent.updateElement({
+      isDisabled: true,
+      isDeleting: true,
+    });
+  };
+
+  setAborting = () => {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#pointComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#addEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#addEditComponent.shake(resetFormState);
   };
 
   #replaceCardToForm = () => {
@@ -102,13 +136,12 @@ export default class PointPresenter {
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       update
     );
-    this.#replaceFormToCard();
   };
 
   #handleFavoriteClick = () => {
     this.#changeData(
       UserAction.UPDATE_POINT,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {...this.#point, isFavorite: !this.#point.isFavorite}
     );
   };

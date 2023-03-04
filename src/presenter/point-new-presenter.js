@@ -1,7 +1,7 @@
 import {render, remove, RenderPosition} from '../framework/render.js';
 import AddEditPointView from '../view/add-edit-point-view.js';
 import {UserAction, UpdateType} from '../const.js';
-import {getRandomInteger} from '../utils/utils.js';
+import {getCities} from '../utils/utils.js';
 
 export default class PointNewPresenter {
   #ponitListContainer = null;
@@ -20,15 +20,15 @@ export default class PointNewPresenter {
     this.#destroyCallback = callback;
     this.#offers = offers;
     this.#destinations = destinations;
-
+    const cities = getCities(this.#destinations);
     if (this.#addEditComponent !== null) {
       return;
     }
 
-    this.#addEditComponent = new AddEditPointView(this.#offers, this.#destinations);
+    this.#addEditComponent = new AddEditPointView(this.#offers, this.#destinations, cities);
 
     this.#addEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
-    this.#addEditComponent.setDeleteClickHandler(this.#handleDeleteClick);
+    this.#addEditComponent.setResetClickHandler(this.#handleDeleteClick);
     render(this.#addEditComponent, this.#ponitListContainer, RenderPosition.AFTERBEGIN);
 
     document.addEventListener('keydown', this.#escKeyDownHandler);
@@ -48,6 +48,26 @@ export default class PointNewPresenter {
 
   };
 
+  setSaving = () => {
+    this.#addEditComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  };
+
+  setAborting = () => {
+    const resetFormState = () => {
+      this.#addEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#addEditComponent.shake(resetFormState);
+  };
+
+
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
@@ -59,9 +79,9 @@ export default class PointNewPresenter {
     this.#changeData(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
-      {id:getRandomInteger(50, 5000),...update}
+      update
     );
-    this.destroy();
+    // this.destroy();
   };
 
   #handleDeleteClick = () => {
